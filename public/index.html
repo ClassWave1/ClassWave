@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VibloProxy</title>
+  <style>
+    body {
+      background: #f1f1f1;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 10%;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: #333;
+    }
+    input[type=text] {
+      width: 60%;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>VibloProxy 🍇</h1>
+  <form id="proxyForm">
+    <input type="text" id="url" placeholder="Enter a website like google.com" required />
+    <button type="submit">Go</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('proxyForm');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const url = document.getElementById('url').value.trim();
+      if (!url) return;
+      window.location.href = '/proxy/' + encodeURIComponent(url);
+    });
+  </script>
+</body>
+</html>
