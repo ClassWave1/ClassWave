@@ -1,53 +1,51 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Login</title>
+  <title>ClassWave Admin Login</title>
   <style>
-    body {
-      background: #121212;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 15%;
-      font-family: sans-serif;
-    }
-    input, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: none;
-    }
-    input {
-      width: 300px;
-    }
-    button {
-      background: #ff5722;
-      color: white;
-      cursor: pointer;
-    }
+    body { font-family: sans-serif; background: #111; color: #0f0; text-align: center; padding: 50px; }
+    input, button { padding: 10px; font-size: 16px; margin: 5px; }
+    #logs { white-space: pre-wrap; margin-top: 20px; text-align: left; background: #000; padding: 10px; border: 1px solid #0f0; max-width: 700px; margin-left: auto; margin-right: auto; }
   </style>
 </head>
 <body>
-  <h2>Admin Login Panel 🔒</h2>
-  <input type="password" id="adminpass" placeholder="Enter admin password">
+  <h1>ClassWave Admin</h1>
+  <p>Enter your top-secret admin password:</p>
+  <input type="password" id="password" placeholder="SecretPassword321">
   <button onclick="login()">Login</button>
-  <p id="response"></p>
+  <div id="status"></div>
+  <div id="logs"></div>
 
   <script>
     async function login() {
-      const pass = document.getElementById('adminpass').value;
-      const res = await fetch('/adminlogin', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ password: pass })
+      const password = document.getElementById("password").value;
+
+      const res = await fetch("/adminlogin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
       });
+
       const data = await res.json();
-      document.getElementById('response').textContent = data.message;
+      document.getElementById("status").textContent = data.message;
+
+      if (data.success) {
+        loadLogs();
+      }
     }
+
+    async function loadLogs() {
+      const res = await fetch("/logs");
+      if (res.ok) {
+        const text = await res.text();
+        document.getElementById("logs").textContent = text;
+      } else {
+        document.getElementById("logs").textContent = "Failed to load logs.";
+      }
+    }
+
+    // Auto-load logs if already logged in
+    loadLogs();
   </script>
 </body>
 </html>
