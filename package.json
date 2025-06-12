@@ -1,14 +1,16 @@
 {
   "name": "classwave-proxy",
   "version": "1.0.0",
-  "description": "Custom proxy for school war 😈",
+  "description": "Custom proxy for school warfare 😈",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
-    "express-rate-limit": "^6.7.0"
+    "express-rate-limit": "^6.7.0",
+    "node-fetch": "^3.4.0"
   }
 }
