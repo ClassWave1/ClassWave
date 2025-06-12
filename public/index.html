@@ -1,21 +1,35 @@
 <!DOCTYPE html>
-<html>
-<head><title>ClassWave Ultraviolet Proxy</title></head>
-<body>
-  <h1>Welcome to ClassWave Proxy</h1>
-  <form onsubmit="event.preventDefault(); go()">
-    <input type="text" id="url" placeholder="Enter a URL like https://chat.openai.com">
-    <button>Go</button>
-  </form>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ClassWave Proxy</title>
+  <script src="/uv/uv.bundle.js" defer></script>
+  <script src="/uv/uv.handler.js" defer></script>
   <script>
-    function go() {
-      const input = document.getElementById("url").value;
-      const encoded = __uv$config.encodeUrl(input);
-      location.href = __uv$config.prefix + "service/" + encoded;
-    }
+    window.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('proxy-form');
+      const input = document.getElementById('proxy-url');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const encodedUrl = __uv$config.prefix + __uv$config.encodeUrl(input.value);
+        window.location.href = encodedUrl;
+      });
+    });
+
+    // UV Config
+    window.__uv$config = {
+      prefix: '/service/',
+      bare: 'https://ulv.classwave1.repl.co/', // fallback if you need a bare server
+      encodeUrl: (url) => btoa(url).replace(/=+$/, ''), // basic encoder
+    };
   </script>
-  <script src="/uv/uv.bundle.js"></script>
-  <script src="/uv/uv.handler.js"></script>
-  <script src="/uv/uv.config.js"></script>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 50px;">
+  <h1>Welcome to ClassWave Proxy</h1>
+  <form id="proxy-form">
+    <input type="text" id="proxy-url" placeholder="https://chat.openai.com" style="padding: 10px; width: 300px;">
+    <button type="submit" style="padding: 10px;">Go</button>
+  </form>
 </body>
 </html>
