@@ -1,8 +1,8 @@
-
 const express = require('express');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
 const fs = require('fs');
+const fetch = require('node-fetch'); // NEW 🔥
 const app = express();
 
 // Settings
@@ -51,12 +51,19 @@ app.post('/adminlogin', (req, res) => {
     }
 });
 
-// Dummy proxy route
-app.get('/proxy/:url', (req, res) => {
-    res.send(`Pretend we're proxying: ${req.params.url}`);
+// 🔥 ACTUAL WORKING PROXY
+app.get('/proxy/:url(*)', async (req, res) => {
+    try {
+        const targetUrl = decodeURIComponent(req.params.url);
+        const response = await fetch(`https://${targetUrl}`);
+        const data = await response.text();
+        res.send(data);
+    } catch (err) {
+        res.status(500).send("Error proxying site");
+    }
 });
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`VibloProxy running on port ${PORT}`);
+    console.log(`ClassWave proxy running on port ${PORT}`);
 });
