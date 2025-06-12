@@ -1,21 +1,21 @@
-const cookieParser = require('cookie-parser');
 const express = require('express');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
 const fs = require('fs');
-const fetch = require('node-fetch'); // NEW 🔥
+const fetch = require('node-fetch');
+const cookieParser = require('cookie-parser');
 const app = express();
 
 // Settings
 const PORT = process.env.PORT || 3000;
-const ADMIN_SECRET = process.env.ADMIN_SECRET || 'vibloadmin123';
+const ADMIN_SECRET = process.env.ADMIN_SECRET || 'SecretPassword321';
 const LOG_FILE = path.join(__dirname, 'logs', 'activity.log');
 const loginAttempts = {};
 
 // Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Brute-force protection
 const limiter = rateLimit({
@@ -31,7 +31,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// Admin panel (unguessable path)
+// Admin login
 app.post('/adminlogin', (req, res) => {
     const ip = req.ip;
     if (!loginAttempts[ip]) loginAttempts[ip] = { count: 0, time: Date.now() };
@@ -46,6 +46,7 @@ app.post('/adminlogin', (req, res) => {
 
     const { password } = req.body;
     if (password === ADMIN_SECRET) {
+        res.cookie("admin", true, { httpOnly: true });
         return res.json({ success: true, message: "Logged in as admin" });
     } else {
         loginAttempts[ip].count++;
@@ -53,19 +54,32 @@ app.post('/adminlogin', (req, res) => {
     }
 });
 
-// 🔥 ACTUAL WORKING PROXY
-app.get('/proxy/:url(*)', async (req, res) => {
+// Admin log viewer
+app.get('/logs', (req, res) => {
+    if (req.cookies.admin !== 'true') {
+        return res.status(403).send("Forbidden");
+    }
+    if (fs.existsSync(LOG_FILE)) {
+        const logs = fs.readFileSync(LOG_FILE, 'utf8');
+        res.send(logs);
+    } else {
+        res.send("No logs yet.");
+    }
+});
+
+// Proxy route
+app.get('/proxy/:url', async (req, res) => {
     try {
-        const targetUrl = decodeURIComponent(req.params.url);
-        const response = await fetch(`https://${targetUrl}`);
-        const data = await response.text();
-        res.send(data);
+        const target = decodeURIComponent(req.params.url);
+        const response = await fetch(`https://${target}`);
+        const html = await response.text();
+        res.send(html);
     } catch (err) {
-        res.status(500).send("Error proxying site");
+        res.status(500).send("Proxy error: " + err.message);
     }
 });
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`ClassWave proxy running on port ${PORT}`);
+    console.log(`ClassWave Proxy running on port ${PORT}`);
 });
